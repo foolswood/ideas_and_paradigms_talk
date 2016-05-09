@@ -8,15 +8,6 @@
 
 \maketitle
 
-When making anything the first thing you have to do is answer one question:
-What do I want?
-This can be a very difficult question.
-Your computer can't help you with it.
-Neither can a talk.
-
-Once that question is answered we can move on to:
-How do I make something that does what I wanted?
-
 I am going to tell you the things I wish someone had told me.
 A lot of what I will talk about is very abstract.
 Much like the idea of $\pi$ as the ratio of the diameter to the circumference
@@ -26,70 +17,26 @@ Similarly manifestations in code of some of the ideas here form the toolkit of
 practical programming.
 
 \section{Big little ideas}
-\subsection{Encapsulation}
-Encapsulation is wrapping up a series of steps (or ideas) into something more
-semantic (meaningful). They are used to lower cognitive load (amount of stuff
-to think about simultaneously).
-
-Say I ask you to make some tea.
-What do you actually have to do to make that happen?
-\begin{enumerate}
-\item Boil water.
-\item Add bag and water to cup.
-\item Wait.
-\item Remove bag.
-\end{enumerate}
-Consider one step of this, what does doing that actually involve?
-
-Each time we break things down more we get closer to a specific set of
-instructions that can be followed to achieve our aim. However you wouldn't want
-to express how to prepare an entire meal in this way, it would be far too
-cumbersome. If you were given the lowest level instructions, would you be able
-to tell what they were trying to acheive?
-
-\subsection{Testing}
-\label{sum_example}
-You might think you don't test your code, but any time you run a program you are testing it.
-
-Say you were making a program that sums numbers.
-The numbers are in a file and we want to print out the result.
-
-When you are considering what encapsulations to make it can be helpful to keep
-in mind how you will know if a step worked.
-
-Thus we might break it down into 3 "first order" encapsulated steps:
-Getting the numbers in.
-Adding them up.
-Outputting the result.
-
-Say we have implemented a function $sum$ that takes a list of number and
-returns the sum of the numbers in that list. How can we tell if it is working?
-We can pick an example and see if it works, for instance we know that:
-\begin{displaymath}
-3 + 4 + 5 = 12
-\end{displaymath}
-so we could enter those numbers and see if it works. Having to do that to see if it still works every time you change the code gets annoying really fast, so we can write some code to test our function:
-\begin{displaymath}
-s(3, 4, 5) ==  12
-\end{displaymath}
-this expression returns $true$ if it works and $false$ if it doesn't, so we can
-tell if it is working without having to enter the numbers by hand.
-
-In this example it may seem a bit excessive to do this, but as larger and
-larger problems are tackled knowing that all the bits work even if they have
-been changed becomes increasingly important.
-
 \subsection{Data}
-Computer memory is essentially boxes with patterns in.
-The patterns usually don't mean anything on their own and must be interpreted
-as a representation of something else.
-For instance in spoken english the word "their/there/they're" is
-indistinguishable, but they mean different things.
-You can have a value that is an address, this is called a pointer.
+In spoken english words are sequences of sounds that, in and of themselves
+these sounds don't mean anything. We ascribe them meaning in order to
+communicate concepts.
 
+Computer memory is essentially boxes with patterns in.
+Like the sounds that make up speech the patterns don't mean anything on their
+own and must be interpreted as a representation of something else.
+
+There are some words (for instance their, there and they're) whos sounds are
+indistinguishable, but have different meanings. This is true in these memory
+patterns too\footnote{this data about data is often called metadata}.
+
+If each box has an addresses then you can have a value that refers to a piece
+of memory, this is called a pointer.
+
+The table below shows a few examples of these patterns and their meanings:
 \begin{tabular}{| l | l || l | l |}
 \hline
-Address & Value & "Type" & "Value" \\
+Address & Pattern & What it represents & Value \\
 \hline
 0x00 & 0x48 & unsigned & 72 \\
 0x01 & 0xFF & signed & -1 \\
@@ -97,19 +44,21 @@ Address & Value & "Type" & "Value" \\
 0x03 & 0x02 & char * & char at 0x02 \\
 \hline
 \end{tabular}
+The right two headings aren't actually stored, the programmer must keep track
+what the data means.
+
 \subsection{Operations}
-Processors implement operations.
+Processors implement operations that transform data, for instance by doing
+arithmetic. These operations have patterns assigned to them so you can select
+which one to do:
 \begin{tabular}{| l | l |}
 \hline
 0xA0 & add \\
 0xA1 & subtract \\
-0xA2 & jump \\
 \hline
 \end{tabular}
-You can make arrays of these operation codes.
-The instruction pointer advances through them one by one (unless forced elsewhere by a jump).
-
-Code is just more data.
+You can make arrays of these patterns, called operation codes or opcodes.
+These patterns are what a computer executes, it's just data.
 
 \subsection{Side effects}
 A side effect is where a procedure changes some state or has an observable
@@ -137,19 +86,77 @@ Can we do each step with what we have?
 Can we do the whole operation with the instructions we have?
 How about if we introduce a copy instruction?
 
-\subsection{Scope}
-The "area" that is "seen and touched" by an operation.
-
-\subsection{Branches}
-Conditional jump.
-
-More branches -> more testing.
+RACE CONDITION EXAMPLE?
 
 \subsection{Immutability}
 Data that does not change.
 
 Useful because it means that if you give 2 procedures the same piece of data they
 can't couple together with it.
+
+\subsection{Branches}
+There is a special piece of memory, called the instruction pointer, which identifies which instruction to do next.
+This advances through them one by one (unless forced elsewhere by a jump).
+We would like to be able to do different things depending on different data.
+So we can introduce a conditional jump operation.
+
+\subsection{Encapsulation}
+Encapsulation is wrapping up a series of steps (or ideas) into something more
+semantic (meaningful). This is used to lower cognitive load (amount of stuff to
+think about simultaneously).
+
+Say I ask you to make some tea.
+What do you actually have to do to make that happen?
+\begin{enumerate}
+\item Boil water.
+\item Add bag and water to cup.
+\item Wait.
+\item Remove bag.
+\end{enumerate}
+Consider one step of this, what does doing that actually involve?
+
+Each time we break things down more we get closer to a specific set of
+instructions that can be followed to achieve our aim. However you wouldn't want
+to express how to prepare an entire meal in the lowest level instructions. It
+would be far too cumbersome, and if you were to be given them would you be able
+to tell what they were trying to acheive?
+
+\subsection{Testing}
+Whenever you try something to see if it works, that's testing.
+Any time you run a program you are testing it.
+
+Say you were making a program that sums numbers.
+
+When you are considering what encapsulations to make it can be helpful to keep
+in mind how you will know if a step worked.
+
+Thus we might break it down into 3 "first order" encapsulated steps:
+\begin{enumerate}
+\item Getting the numbers in.
+\item Adding them up.
+\item Outputting the result.
+\end{enumerate}
+
+Say we have implemented a function $sum$ that takes a list of number and
+returns the sum of the numbers in that list. How can we tell if it is working?
+We can pick an example and see if it works, for instance we know that:
+\begin{displaymath}
+3 + 4 + 5 == 12
+\end{displaymath}
+so we could enter those numbers and see if it works. Having to do that to see
+if it still works every time you change the code gets annoying really fast, so
+we can write some code to test our function:
+\begin{displaymath}
+s(3, 4, 5) ==  12
+\end{displaymath}
+this expression returns $true$ if it works and $false$ if it doesn't, so we can
+tell if it is working without having to enter the numbers by hand.
+
+In this example it may seem a bit excessive to do this, but as larger and
+larger problems are tackled knowing that all the bits work even if they have
+been changed becomes increasingly important.
+
+Programs with many interacting branches require a lot of testing.
 
 \section{Language Paradigms}
 In principle you could write everything as lists of opcodes (and on some level
@@ -189,41 +196,131 @@ We might also like to have somewhere to put intermediate results.
 
 We still have to know what data we are acting on, and which functions work on that.
 \subsection{Object Oriented}
-Int/float addition example.
-You have to remember which function to call for the data you have.
+Consider for instance our 2 integer representations, signed and unsigned.
+If you want to add them then there are 4 operations for this, one for each
+combination of the types.
+
+Say you just want to add them and you don't want to have to know what type they are.
+What approaches to solve this can you think of?
+What advantages and disadvantages do they have?
+
 \subsubsection{Classes}
 Objects stick functions to data so you don't have to know which one to call.
 These objects are usually called classes.
-\subsubsection{Polymorphism}
-(cats, dogs, woofs, barks)
-\subsection{Functional}
-No side effects, all data is immutable, no loops.
-\subsection{Lambda functions}
-Defining new functions at run time normal.
 
+For our integer addition example, the class might look something like this:
+\begin{tabular}{| r || l | l | l |}
+\hline
+"Type" & Add unsigned & Add signed & Value \\
+\hline
+Unsigned & add\_unsigned\_unsigned & add\_unsigned\_signed & 12 \\
+Signed & add\_signed\_unsigned & add\_signed\_unsigned & -3 \\
+\hline
+\end{tabular}
+
+\subsubsection{Polymorphism}
+As a user of a class, we don't have to know which objects we operate on anymore.
+So long as they have the structure we expect, we can add and remove new types
+at any time without changing the calling code.
+
+For example if we have a set of classes representing animals that provide a
+"say" method. We can write some code that works for all animals that tells you
+what they say, without knowing what the animals are.
+
+\subsection{Functional}
+We've seen how side effects, and mutable data can cause us trouble.
+So what happens if we constrain ourselves not to have them?
+
+How do you loop when you can't change the value you assigned to something?
 \subsubsection{Recursion}
-Sum
+You can call your function from itself:
+\begin{displaymath}
+sum(a) = a ;\; sum(a, ...) = a + sum(...)
+\end{displaymath}
+
+\subsubsection{Dynamic functions}
+Think of a function that adds 3 to another number:
+\begin{displaymath}
+f(x): x + 3
+\end{displaymath}
+That's a function you can write by hand, say I want one of those for each
+integer, you could be writing them out for some time.
+
+We can use functions can define new functions.
+For our example we need a function that takes in a number and returns a
+function that adds the number we asked to be added:
+\begin{displaymath}
+g(y): (f(x): x + y)
+\end{displaymath}
 
 \subsubsection{Metafunctions}
-Map
+Say we wanted to subtract instead of add a list of integers.
+How could we do that?
+Write a recursive version of the subtraction in the same way as we did for sum
+above.
+
+However having to write recursive versions of every way of combining 2 things
+we could ever want to do is going to get annoying really fast.
+
+What if we pass one function to another?
+Then we can write a function that returns  whose elements are the
+tranformed elements of another.
+This function is usually called fold or reduce:
+\begin{displaymath}
+fold(f, i, x): f(i, x) ;\; fold(f, i, x, ...) = f(x, fold(f, i, ...))
+\end{displaymath}
+
 \subsection{"Faux-O"}
-Functions attached to objects, but immutable data.
-Easier to reason about and test than regular oo.
+We're now going somewhere that many programmers fear to tread.
+What do we get if we do all the things we've talked about at once?
+
+Given that they cannot mutate the instance, what do the methods on these
+classes do?
+Return new instances, constructed such that the desired changes are made.
 
 Try implementing addition with this.
 
 \section{System Paradigms}
-Programs rarely live in isolation, they are often used together to form systems.
+Programs are often used together to make something that works, these composite
+entities are called systems.
+
 \subsection{Batch Jobs}
-Canteen meals.
-Train timetables.
+Think of a production line, each component is given the result of the previous
+one, and its result is passed along to the next.
+
+Let's consider a scoreboard.
+We could have a button that sends a signal to a counter which sends a total on
+to a display.
+
+The components are known and fixed.
+If in our example I wanted to add a second display the system has to be
+changed.
+
 \subsection{Remote Procedure Calls}
-For instance the web browser you use displays data that it requests from servers, forming a 2 component system.
-Ordering food, if you only have one oven...
+A web browser displays data that it requests from servers, forming a 2
+component system. The browser doesn't know about every site it might be asked
+to connect to, and the servers don't know who might connect to them.
+
+We could do a score card here too.
+We could have a page used to update the score, and one for viewing it.
+The one to update the score can only be used by one person at once.
+
+You have to refresh the view page frequently to keep up to date\footnote{
+this repeated data getting is called polling}.
+
 \subsection{Queues}
-Put orders on, anyone can fulfil them.
-Don't need to know who to send things to.
-\subsection{"Events and Subscriptions"}
-I need to know when "x" changes, get back to me when it does.
+Let's say we introduce queues, messages can be put onto them, or consumed from them.
+
+How would we do the score board here?
+Button presses put something in an "input" queue.
+The counter consumes the "input" queue putting the latest total on an "output" queue.
+The display consumes the "output" queue displaying the latest value.
+
+Which components need to know about which others?
+The only thing everyone has to know about is where the queues are.
+
+What happens if we add a second display to this?
+
+\subsection{Events and Subscriptions}
 
 \end{document}
