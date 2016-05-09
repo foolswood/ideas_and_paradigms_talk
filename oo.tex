@@ -1,0 +1,229 @@
+\documentclass{article}
+
+\title{Keeping big things simple}
+\author{David Honour}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+When making anything the first thing you have to do is answer one question:
+What do I want?
+This can be a very difficult question.
+Your computer can't help you with it.
+Neither can a talk.
+
+Once that question is answered we can move on to:
+How do I make something that does what I wanted?
+
+I am going to tell you the things I wish someone had told me.
+A lot of what I will talk about is very abstract.
+Much like the idea of $\pi$ as the ratio of the diameter to the circumference
+of a circle is good to reason about, it can't be used for calculations.
+However numerical approximations of $\pi$ are applicable in many situations.
+Similarly manifestations in code of some of the ideas here form the toolkit of
+practical programming.
+
+\section{Big little ideas}
+\subsection{Encapsulation}
+Encapsulation is wrapping up a series of steps (or ideas) into something more
+semantic (meaningful). They are used to lower cognitive load (amount of stuff
+to think about simultaneously).
+
+Say I ask you to make some tea.
+What do you actually have to do to make that happen?
+\begin{enumerate}
+\item Boil water.
+\item Add bag and water to cup.
+\item Wait.
+\item Remove bag.
+\end{enumerate}
+Consider one step of this, what does doing that actually involve?
+
+Each time we break things down more we get closer to a specific set of
+instructions that can be followed to achieve our aim. However you wouldn't want
+to express how to prepare an entire meal in this way, it would be far too
+cumbersome. If you were given the lowest level instructions, would you be able
+to tell what they were trying to acheive?
+
+\subsection{Testing}
+\label{sum_example}
+You might think you don't test your code, but any time you run a program you are testing it.
+
+Say you were making a program that sums numbers.
+The numbers are in a file and we want to print out the result.
+
+When you are considering what encapsulations to make it can be helpful to keep
+in mind how you will know if a step worked.
+
+Thus we might break it down into 3 "first order" encapsulated steps:
+Getting the numbers in.
+Adding them up.
+Outputting the result.
+
+Say we have implemented a function $sum$ that takes a list of number and
+returns the sum of the numbers in that list. How can we tell if it is working?
+We can pick an example and see if it works, for instance we know that:
+\begin{displaymath}
+3 + 4 + 5 = 12
+\end{displaymath}
+so we could enter those numbers and see if it works. Having to do that to see if it still works every time you change the code gets annoying really fast, so we can write some code to test our function:
+\begin{displaymath}
+s(3, 4, 5) ==  12
+\end{displaymath}
+this expression returns $true$ if it works and $false$ if it doesn't, so we can
+tell if it is working without having to enter the numbers by hand.
+
+In this example it may seem a bit excessive to do this, but as larger and
+larger problems are tackled knowing that all the bits work even if they have
+been changed becomes increasingly important.
+
+\subsection{Data}
+Computer memory is essentially boxes with patterns in.
+The patterns usually don't mean anything on their own and must be interpreted
+as a representation of something else.
+For instance in spoken english the word "their/there/they're" is
+indistinguishable, but they mean different things.
+You can have a value that is an address, this is called a pointer.
+
+\begin{tabular}{| l | l || l | l |}
+\hline
+Address & Value & "Type" & "Value" \\
+\hline
+0x00 & 0x48 & unsigned & 72 \\
+0x01 & 0xFF & signed & -1 \\
+0x02 & 0x48 & char & H \\
+0x03 & 0x02 & char * & char at 0x02 \\
+\hline
+\end{tabular}
+\subsection{Operations}
+Processors implement operations.
+\begin{tabular}{| l | l |}
+\hline
+0xA0 & add \\
+0xA1 & subtract \\
+0xA2 & jump \\
+\hline
+\end{tabular}
+You can make arrays of these operation codes.
+The instruction pointer advances through them one by one (unless forced elsewhere by a jump).
+
+Code is just more data.
+
+\subsection{Side effects}
+A side effect is where a procedure changes some state or has an observable
+interaction with the rest of the system.
+
+Assume we have an instruction that adds two unsigneds "in place"\footnote{such
+that the result is stored in the place where the input used to be}.
+If we have a list of 3 unsigned numbers and we want the sum of them what might we do?
+
+We could add numbers 1 and 2 to the 0th, then the 0th number would be the sum.
+No memory above that required to store the numbers is needed and it has been
+done in the minimum possible number of operations. A side effect has occurred,
+the original data has been changed.
+
+Assume we have in place instructions for $+-\div\times$.
+Can we find the mean, $\mu$, of 3 numbers?
+\begin{displaymath}
+\mu = \frac{a + b + c}{3}
+\end{displaymath}
+How about the variance $V$?
+\begin{displaymath}
+V = \frac{(a - \mu)^2 + (b - \mu)^2 + (c - \mu)^2}{3}
+\end{displaymath}
+Can we do each step with what we have?
+Can we do the whole operation with the instructions we have?
+How about if we introduce a copy instruction?
+
+\subsection{Scope}
+The "area" that is "seen and touched" by an operation.
+
+\subsection{Branches}
+Conditional jump.
+
+More branches -> more testing.
+
+\subsection{Immutability}
+Data that does not change.
+
+Useful because it means that if you give 2 procedures the same piece of data they
+can't couple together with it.
+
+\section{Language Paradigms}
+In principle you could write everything as lists of opcodes (and on some level
+everything is). However hopefully, as with the tea example, you can see that
+writing anything large in that way will quickly become incomprehensible.
+So let's talk about some constructs that are used to ease the cognitive
+load\footnote{amount of stuff to think about all at once}.
+\subsection{Procedural}
+You might note what we have been talking about so far results in highly
+repetitive code.  For instance we might have liked to use the sum function we
+had when finding the mean?
+\subsubsection{Macros}
+Macros let us name lists of operations and reuse them in a parameterised way.
+They're like templates, they may have spaces that we fill in when we use them.
+
+Write some instructions (high level) for making coffee.
+You can write instructions for a person making tea + coffee by writing a "make
+a hot drink" macro and substituting the drink type.
+
+Double(a) = a + a
+
+Have a go for sum.
+
+So now we have a reusable block, which is great in that you don't have to type
+it repeatedly.  It also has an additional, perhaps less obvious benefit in that
+if there's a problem with it we only have to fix it once.\footnote{
+code exhibiting little repetition is often referred to as "dry" (short for
+don't repeat yourself)}
+
+We still need to know about the contents of every macro, for instance where it
+stores its output, in order to use it.
+\subsubsection{Functions}
+We pass into a set of instructions where we would like the result to go.
+We also pass where we want the instruction pointer to go afterwards.
+This means our instructions themselves can be reused, not just the templates of them.
+We might also like to have somewhere to put intermediate results.
+
+We still have to know what data we are acting on, and which functions work on that.
+\subsection{Object Oriented}
+Int/float addition example.
+You have to remember which function to call for the data you have.
+\subsubsection{Classes}
+Objects stick functions to data so you don't have to know which one to call.
+These objects are usually called classes.
+\subsubsection{Polymorphism}
+(cats, dogs, woofs, barks)
+\subsection{Functional}
+No side effects, all data is immutable, no loops.
+\subsection{Lambda functions}
+Defining new functions at run time normal.
+
+\subsubsection{Recursion}
+Sum
+
+\subsubsection{Metafunctions}
+Map
+\subsection{"Faux-O"}
+Functions attached to objects, but immutable data.
+Easier to reason about and test than regular oo.
+
+Try implementing addition with this.
+
+\section{System Paradigms}
+Programs rarely live in isolation, they are often used together to form systems.
+\subsection{Batch Jobs}
+Canteen meals.
+Train timetables.
+\subsection{Remote Procedure Calls}
+For instance the web browser you use displays data that it requests from servers, forming a 2 component system.
+Ordering food, if you only have one oven...
+\subsection{Queues}
+Put orders on, anyone can fulfil them.
+Don't need to know who to send things to.
+\subsection{"Events and Subscriptions"}
+I need to know when "x" changes, get back to me when it does.
+
+\end{document}
