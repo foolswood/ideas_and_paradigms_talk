@@ -300,6 +300,25 @@ You can call your function from itself:
 sum(a) = a ;\; sum(a, ...) = a + sum(...)
 \end{displaymath}
 
+\subsubsection{Metafunctions}
+Say we wanted to multiply instead of add a list of integers.
+How could we do that?
+Write a recursive version of the product function in the same way as we did for
+sum above.
+
+However having to write recursive versions of every way of combining 2 things
+we could ever want to do is going to get annoying really fast.
+
+What if we pass one function to another?
+We could, for example write a function that applies any 2 input function to
+reduce a list down to a single value.
+This function is usually called fold or reduce:
+\begin{displaymath}
+\mathrm{fold}(f, i, x): f(i, x) ;\; \mathrm{fold}(f, i, x, ...) = f(x, \mathrm{fold}(f, i, ...))
+\end{displaymath}
+where $f$ is the 2 input function to apply, $i$ is an initial value to start
+the process with and $...$ is a list.
+
 \subsubsection{Dynamic functions}
 Think of a function that adds 3 to another number:
 \begin{displaymath}
@@ -314,25 +333,6 @@ function that adds the number we asked to be added:
 \begin{displaymath}
 g(y): (f(x): x + y)
 \end{displaymath}
-
-\subsubsection{Metafunctions}
-Say we wanted to subtract instead of add a list of integers.
-How could we do that?
-Write a recursive version of the subtraction in the same way as we did for sum
-above.
-
-However having to write recursive versions of every way of combining 2 things
-we could ever want to do is going to get annoying really fast.
-
-What if we pass one function to another?
-We could, for example write a function that applies any 2 input function to
-reduce a list down to a single value.
-This function is usually called fold or reduce:
-\begin{displaymath}
-\mathrm{fold}(f, i, x): f(i, x) ;\; \mathrm{fold}(f, i, x, ...) = f(x, \mathrm{fold}(f, i, ...))
-\end{displaymath}
-where $f$ is the 2 input function to apply, $i$ is an initial value to start
-the process with and $...$ is a list.
 
 \subsection{"Faux-O"}
 We're now going somewhere that many professionals haven't considered.
