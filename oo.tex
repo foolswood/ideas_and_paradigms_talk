@@ -9,14 +9,22 @@
 \maketitle
 
 I am going to tell you the things I wish someone had told me.
-A lot of what I will talk about is very abstract.
+Many of my colleagues think I'm mad for trying this as much of what I will talk
+about is very abstract.
 Much like the idea of $\pi$ as the ratio of the diameter to the circumference
-of a circle is good to reason about, it can't be used for calculations.
+of a circle is useful, it can't be used for calculations.
 However numerical approximations of $\pi$ are applicable in many situations.
 Similarly manifestations in code of some of the ideas here form the toolkit of
 practical programming.
 
 \section{Big little ideas}
+The things introduced in this section are small ideas with big implications.
+I don't think any of them is complex, the difficulty is in remaining aware of
+them when deep in the details of the problem you're trying to solve.
+
+However, perhaps counter intuitively doing so can actually help to keep your
+mind on what you are trying to achieve in the longer term. This is mainly
+because the things you make will often be simpler and easier to understand.
 \subsection{Data}
 In spoken english words are sequences of sounds that, in and of themselves
 these sounds don't mean anything. We ascribe them meaning in order to
@@ -26,14 +34,16 @@ Computer memory is essentially boxes with patterns in.
 Like the sounds that make up speech the patterns don't mean anything on their
 own and must be interpreted as a representation of something else.
 
-There are some words (for instance their, there and they're) whos sounds are
+There are some words (for instance their, there and they're) that sound
 indistinguishable, but have different meanings. This is true in these memory
-patterns too\footnote{this data about data is often called metadata}.
+patterns too. Therefore each pattern also has an implicit meaning (or
+type)\footnote{data like this about data is often called metadata}.
 
-If each box has an addresses then you can have a value that refers to a piece
-of memory, this is called a pointer.
-
-The table below shows a few examples of these patterns and their meanings:
+If each box is assigned an addresses then you can have a value that refers to a
+piece of memory, this is called a pointer. Table \ref{pattern_examples} contains
+some examples of these patterns and their possible meanings.
+\begin{table}[h]
+\centering
 \begin{tabular}{| l | l || l | l |}
 \hline
 Address & Pattern & What it represents & Value \\
@@ -44,21 +54,31 @@ Address & Pattern & What it represents & Value \\
 0x03 & 0x02 & char * & char at 0x02 \\
 \hline
 \end{tabular}
-The right two headings aren't actually stored, the programmer must keep track
-what the data means.
+\caption{Some example bit patterns and their meanings. Note that the right two
+headings aren't actually stored, the programmer must keep track of what the
+data means.}
+\label{pattern_examples}
+\end{table}
 
 \subsection{Operations}
 Processors implement operations that transform data, for instance by doing
 arithmetic. These operations have patterns assigned to them so you can select
 which one to do:
+\begin{table}[h]
+\centering
 \begin{tabular}{| l | l |}
+\hline
+Pattern & Operation \\
 \hline
 0xA0 & add \\
 0xA1 & subtract \\
 \hline
 \end{tabular}
+\label{opcodes}
+\end{table}
+
 You can make arrays of these patterns, called operation codes or opcodes.
-These patterns are what a computer executes, it's just data.
+These patterns determine what a computer executes, it's just data.
 
 \subsection{Side effects}
 A side effect is where a procedure changes some state or has an observable
@@ -86,19 +106,39 @@ Can we do each step with what we have?
 Can we do the whole operation with the instructions we have?
 How about if we introduce a copy instruction?
 
-RACE CONDITION EXAMPLE?
-
 \subsection{Immutability}
-Data that does not change.
+Even in this simple example keeping track of what data is about to be changed
+(or mutated) is getting a bit fiddly.
+A proceedure operating on immutable data may not change its input.
 
-Useful because it means that if you give 2 procedures the same piece of data they
-can't couple together with it.
+This is useful because it makes it much simpler to assemble larger code from
+building blocks that behave in this way as they don't "trample" the input.
+This also means that if you give 2 procedures the same piece of data they can't
+couple together (thus introducing complexity) with it.
+
+Have another go at the variance, this time the results of the arithmetic
+instructions go into a 3rd piece of memory leaving the inputs untouched.
 
 \subsection{Branches}
-There is a special piece of memory, called the instruction pointer, which identifies which instruction to do next.
-This advances through them one by one (unless forced elsewhere by a jump).
-We would like to be able to do different things depending on different data.
-So we can introduce a conditional jump operation.
+So far we have talked about instructions as though they are a linear list, read
+from top to bottom, but haven't said what keeps track of where we are.
+There is a special piece of memory, called the instruction pointer, which
+identifies which instruction to do next.
+At the start of the processing cycle this pointer is followed to find the next
+instruction to perform.
+This is usually incremented\footnote{has one added to it} at the end of each
+instruction so that we move through the instructions as if we were reading
+them.
+
+There are some instructions (called jumps) that can change the value of the
+instruction pointer (and therefore change which instructions are next).
+Try making a counter with in place addition and a simple jump.
+
+We would also like to be able to do different things depending on data we get
+whilst running. This "changing direction" based on input is known as branching.
+So we use a conditional jump operation, for instance if this is 0 jump here,
+otherwise here to change the flow of the program based on this data.
+Try making a counter that stops at 5 with this.
 
 \subsection{Encapsulation}
 Encapsulation is wrapping up a series of steps (or ideas) into something more
@@ -123,78 +163,96 @@ to tell what they were trying to acheive?
 
 \subsection{Testing}
 Whenever you try something to see if it works, that's testing.
-Any time you run a program you are testing it.
+Say you were making a program that sums a list of numbers.
+How can we tell if it works?
 
-Say you were making a program that sums numbers.
-
-When you are considering what encapsulations to make it can be helpful to keep
-in mind how you will know if a step worked.
-
-Thus we might break it down into 3 "first order" encapsulated steps:
-\begin{enumerate}
-\item Getting the numbers in.
-\item Adding them up.
-\item Outputting the result.
-\end{enumerate}
-
-Say we have implemented a function $sum$ that takes a list of number and
-returns the sum of the numbers in that list. How can we tell if it is working?
-We can pick an example and see if it works, for instance we know that:
+We can pick an example and check that the result is what we expect.
+For instance in our example we know that:
 \begin{displaymath}
 3 + 4 + 5 == 12
 \end{displaymath}
-so we could enter those numbers and see if it works. Having to do that to see
-if it still works every time you change the code gets annoying really fast, so
-we can write some code to test our function:
+so we could manually enter those numbers and see if it works. Having to do that
+to see if it still works every time the code is changed gets annoying really
+fast, so we can write some code to test our function:
 \begin{displaymath}
-s(3, 4, 5) ==  12
+\mathrm{sum}(3, 4, 5) ==  12
 \end{displaymath}
-this expression returns $true$ if it works and $false$ if it doesn't, so we can
-tell if it is working without having to enter the numbers by hand.
+this is $true$ if the function works and $false$ if it doesn't, so we can run
+this to tell us if the sum program works as expected.
 
-In this example it may seem a bit excessive to do this, but as larger and
-larger problems are tackled knowing that all the bits work even if they have
-been changed becomes increasingly important.
+In this example it is somewhat excessive to do this, but as larger and larger
+problems are tackled knowing that all the bits work even if they have been
+changed becomes increasingly important in working out what's broken.
+Customers don't like being sent new versions that fix some things and break
+others so this kind of testing is extremely important in retaining them.
 
-Programs with many interacting branches require a lot of testing.
+If we want to test our program fully we must follow all branches (otherwise
+that code will not be run and we won't know if it all works).
+If the branches are independant (e.g. they don't interact) then the number of
+tests goes as $2 \times n_{branches}$.
+
+However if all our branches interact the number of tests we require goes as
+$n_{tests} = 2^{n_{branches}}$ which quickly becomes impractically large.
+
+Often we have a mixture of interacting and non-interacting branches, so the
+second term dominates.
+Hence we often test components at each level covering all of their branches,
+before moving to the next\footnote{this is usually called unit testing}.
 
 \section{Language Paradigms}
-In principle you could write everything as lists of opcodes (and on some level
-everything is). However hopefully, as with the tea example, you can see that
-writing anything large in that way will quickly become incomprehensible.
-So let's talk about some constructs that are used to ease the cognitive
-load\footnote{amount of stuff to think about all at once}.
+In principle you could write everything as lists of opcodes. That's what your
+computer actually runs, on some level everything is. However if you think back
+to the tea example, you can see that writing anything large in that way will
+quickly become incomprehensible. So let's talk about some constructs that are
+used to ease the cognitive load.
 \subsection{Procedural}
 You might note what we have been talking about so far results in highly
-repetitive code.  For instance we might have liked to use the sum function we
-had when finding the mean?
+repetitive code.  For instance we might have liked to use the code we already
+had for the sum when finding the mean?
 \subsubsection{Macros}
-Macros let us name lists of operations and reuse them in a parameterised way.
+Macros let us name chunks of operations for reuse in a parameterised way.
 They're like templates, they may have spaces that we fill in when we use them.
 
 Write some instructions (high level) for making coffee.
 You can write instructions for a person making tea + coffee by writing a "make
-a hot drink" macro and substituting the drink type.
-
-Double(a) = a + a
-
-Have a go for sum.
+a hot drink" macro and substituting the parts that are drink type specific.
 
 So now we have a reusable block, which is great in that you don't have to type
 it repeatedly.  It also has an additional, perhaps less obvious benefit in that
-if there's a problem with it we only have to fix it once.\footnote{
-code exhibiting little repetition is often referred to as "dry" (short for
-don't repeat yourself)}
+if there's a problem with it we are more likely to find it, as we use it more,
+and only have to fix it once.\footnote{
+code exhibiting little repetition is often referred to as DRY
+(Don't Repeat Yourself)}
 
+As good as this reduction in repetition is, there are still some irritations.
 We still need to know about the contents of every macro, for instance where it
 stores its output, in order to use it.
+Our code also becomes very large as everywhere we use a macro, the
+instructions are repeated.
 \subsubsection{Functions}
-We pass into a set of instructions where we would like the result to go.
-We also pass where we want the instruction pointer to go afterwards.
-This means our instructions themselves can be reused, not just the templates of them.
-We might also like to have somewhere to put intermediate results.
+Functions formalise how input, output and control flow around a chunk of
+instructions work.
+What properties might we want from rules about these things?
 
-We still have to know what data we are acting on, and which functions work on that.
+We'd like to know what values our inputs have taken, without knowing what
+they're called.
+So we supply those inputs in an array in a known location.
+
+We'd like to know where the result is.
+So we pass into every set of instructions where we would like the result to go.
+
+We'd like to be able to reuse the chunk without copying it, this means we need
+it to know where to go next.
+So we pass in a value for the instruction pointer we want the code to go afterwards.
+
+We might also like to have somewhere to put intermediate results.
+This means our instructions themselves can be reused, not just the templates of them.
+A mechanism\footnote{usually a stack} is often provided for this.
+
+With this in place we no longer have to know about the details of each chunk of
+code we use, only its intent and standardised function boundary (known as its
+function signature).
+
 \subsection{Object Oriented}
 Consider for instance our 2 integer representations, signed and unsigned.
 If you want to add them then there are 4 operations for this, one for each
@@ -209,6 +267,8 @@ Objects stick functions to data so you don't have to know which one to call.
 These objects are usually called classes.
 
 For our integer addition example, the class might look something like this:
+\begin{table}[h]
+\centering
 \begin{tabular}{| r || l | l | l |}
 \hline
 "Type" & Add unsigned & Add signed & Value \\
@@ -217,6 +277,7 @@ Unsigned & add\_unsigned\_unsigned & add\_unsigned\_signed & 12 \\
 Signed & add\_signed\_unsigned & add\_signed\_unsigned & -3 \\
 \hline
 \end{tabular}
+\end{table}
 
 \subsubsection{Polymorphism}
 As a user of a class, we don't have to know which objects we operate on anymore.
@@ -231,8 +292,8 @@ what they say, without knowing what the animals are.
 We've seen how side effects, and mutable data can cause us trouble.
 So what happens if we constrain ourselves not to have them?
 
-How do you loop when you can't change the value you assigned to something?
 \subsubsection{Recursion}
+How do you loop when you can't change the value you assigned to something?
 You can call your function from itself:
 \begin{displaymath}
 sum(a) = a ;\; sum(a, ...) = a + sum(...)
@@ -263,15 +324,17 @@ However having to write recursive versions of every way of combining 2 things
 we could ever want to do is going to get annoying really fast.
 
 What if we pass one function to another?
-Then we can write a function that returns  whose elements are the
-tranformed elements of another.
+We could, for example write a function that applies any 2 input function to
+reduce a list down to a single value.
 This function is usually called fold or reduce:
 \begin{displaymath}
-fold(f, i, x): f(i, x) ;\; fold(f, i, x, ...) = f(x, fold(f, i, ...))
+\mathrm{fold}(f, i, x): f(i, x) ;\; \mathrm{fold}(f, i, x, ...) = f(x, \mathrm{fold}(f, i, ...))
 \end{displaymath}
+where $f$ is the 2 input function to apply, $i$ is an initial value to start
+the process with and $...$ is a list.
 
 \subsection{"Faux-O"}
-We're now going somewhere that many programmers fear to tread.
+We're now going somewhere that many professionals haven't considered.
 What do we get if we do all the things we've talked about at once?
 
 Given that they cannot mutate the instance, what do the methods on these
@@ -321,6 +384,10 @@ The only thing everyone has to know about is where the queues are.
 
 What happens if we add a second display to this?
 
-\subsection{Events and Subscriptions}
+\section{If this intrigued you...}
+Look up Gary Bernhardt (destroyallsoftware.com), his screencasts and conference
+talks are great.
+Other than that, I'm happy to point you to things based on what interests you.
+My email is davhonou@cisco.com if you want to take that offer up.
 
 \end{document}
