@@ -78,7 +78,7 @@ Pattern & Operation \\
 \end{table}
 
 You can make arrays of these patterns, called operation codes or opcodes.
-These patterns determine what a computer executes, it's just data.
+These determine what a computer executes, it's just data.
 
 \subsection{Side effects}
 A side effect is where a procedure changes some state or has an observable
@@ -189,10 +189,10 @@ others so this kind of testing is extremely important in retaining them.
 If we want to test our program fully we must follow all branches (otherwise
 that code will not be run and we won't know if it all works).
 If the branches are independant (e.g. they don't interact) then the number of
-tests goes as $2 \times n_{branches}$.
-
+tests goes as $2 n_{\mathrm{branches}}$.
 However if all our branches interact the number of tests we require goes as
-$n_{tests} = 2^{n_{branches}}$ which quickly becomes impractically large.
+$n_{\mathrm{tests}} = 2^{n_{\mathrm{branches}}}$ which quickly becomes
+impractically large.
 
 Often we have a mixture of interacting and non-interacting branches, so the
 second term dominates.
@@ -336,6 +336,9 @@ the process with and $...$ is a list.
 \subsection{"Faux-O"}
 We're now going somewhere that many professionals haven't considered.
 What do we get if we do all the things we've talked about at once?
+This paradigm doesn't have a widely recognised name as the others do, so this
+is less googleable\footnote{the name used here is from a Gary Bernhardt's
+Boundaries talk.}.
 
 Given that they cannot mutate the instance, what do the methods on these
 classes do?
@@ -368,8 +371,8 @@ We could do a score card here too.
 We could have a page used to update the score, and one for viewing it.
 The one to update the score can only be used by one person at once.
 
-You have to refresh the view page frequently to keep up to date\footnote{
-this repeated data getting is called polling}.
+You have to refresh the view page frequently to keep up to date.
+This repeated data getting to see if it has changed is called polling.
 
 \subsection{Queues}
 Let's say we introduce queues, messages can be put onto them, or consumed from them.
